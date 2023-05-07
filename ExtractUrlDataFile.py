@@ -10,7 +10,7 @@ class ExtractUrlData():
     #url = 'http://nfce.sefaz.pe.gov.br/nfce-web/consultarNFCe?p=26230461585865160353650080005246131848088489|2|1|1|311263B23AA9F2062663B95C752C14D2B01DC911'
 
     def __init__(self, url:str):
-        self.__url = url
+        self.__url = 'http'+url.split('http')[1]
         self.dict_type = {
             str(type([])):'list',
             str(type({})):'dict'

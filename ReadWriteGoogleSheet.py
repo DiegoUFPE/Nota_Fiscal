@@ -7,7 +7,7 @@ class ReadWriteGoogleSheet:
         'https://www.googleapis.com/auth/drive'
     ]
 
-    def __init__(self,prods:list,date:str):
+    def __init__(self,prods=[],date=""):
         self.prods = prods
         self.date = date
 
@@ -16,16 +16,21 @@ class ReadWriteGoogleSheet:
         self.file = gspread.authorize(self.creds)
         self.workbook = self.file.open("Purchase_Data")
         self.sheet = self.workbook.sheet1
-        self.dict_sheet = self.sheet.get_all_records()
+        self.dict_sheet = {}
 
+    def get_dict_sheet(self):
+        return self.sheet.get_all_records()
+    
     def create_content_list(self,prod:dict):
-         return [prod['Nome'],prod['Preço'],self.date,prod['Sessão']]
+         return [prod['Nome'],prod['Preço'],int(self.date.split("/")[0]),int(self.date.split("/")[1]),int(self.date.split("/")[2]),prod['Sessão']]
     
     def evaluate_input(self,prod:dict):
         prod_info = {
             "Nome":prod["Nome"],
             "Preço":float(prod["Preço"]),
-            "Data":self.date,
+            "Dia":int(self.date.split("/")[0]),
+            "Mês":int(self.date.split("/")[1]),
+            "Ano":int(self.date.split("/")[2]),
             "Sessão":prod["Sessão"]
         }
         #print("prod_info: ")
@@ -38,13 +43,19 @@ class ReadWriteGoogleSheet:
         return True
 
     def update_sheet(self):
+        self.dict_sheet = self.get_dict_sheet()
         tam = len(self.dict_sheet)
+        verify = 0
         for i in self.prods:
-            if self.evaluate_input(i):
+            if not self.evaluate_input(i):
+                verify+=1
+        if verify != len(self.prods):
+            for i in self.prods:
                 content_list = self.create_content_list(i)
-                interval = 'A'+str(tam+2)+':D'+str(tam+2)
+                interval = 'A'+str(tam+2)+':F'+str(tam+2)
                 tam+=1
                 self.sheet.update(interval,[content_list])
-            else:
-                return False
-        return True
+            return True
+        else:    
+            return False
+        
