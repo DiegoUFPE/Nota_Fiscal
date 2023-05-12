@@ -1,0 +1,63 @@
+!pip install yfinance --upgrade --no-cache-dir
+
+import numpy as np
+import pandas_datareader.data as web
+import yfinance as yf
+yf.pdr_override()
+import seaborn as sns
+
+#criando o gráfico do IBOV
+ibov = web.get_data_yahoo('^BVSP')
+ibov["Close"].plot(figsize=(16,6))
+
+#IBOV fatiado no ano de 2008
+ibov.head()
+ibov.tail()
+ibov_fatiado = ibov[ibov.index.year == 2008]
+ibov_fatiado["Close"].plot(figsize=(20,6), label = "IBOV")
+plt.legend()
+
+#Ibov e dólar começando em 2007
+tickers = ['^BVSP', 'USDBRL=X']
+carteira = web.get_data_yahoo(tickers, start = '2007-01-01')["Close"]
+carteira.columns = ['DOLAR', 'IBOV']
+carteira
+
+#criando os gráfico de IBOV, dólar e IBOV dolarizado
+sns.set()
+carteira["IBOV_DOLARIZADO"] = (carteira["IBOV"] / carteira["DOLAR"])
+carteira.plot(subplots = True, figsize = (16,6))
+
+#correlação entre dólar e IBOV
+sns.heatmap(carteira.corr(), annot = True)
+carteira["DOLAR"].rolling(252).corr(carteira["IBOV"]).plot(figsize = (16,6))
+
+#IPCA acumulado dos últimos 20 anos
+dados = {'Ano': [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], 'IPCA': [12.53, 9.3, 7.6, 5.69, 3.14, 4.46, 5.9, 4.31, 5.91, 6.5, 5.84, 5.91, 6.41, 10.67, 6.26, 2.95, 3.75, 4.31, 4.52, 10.06, 5.79]}
+df2 = pd.DataFrame(data=dados)
+df2
+fig, ax = plt.subplots(figsize=(18,6))
+plt.plot(df2['Ano'], df2['IPCA'])
+
+for i, txt in enumerate(df2['IPCA']):
+    ax.annotate(txt, (df2['Ano'][i], df2['IPCA'][i]))
+
+plt.xlabel('Ano')
+plt.ylabel('IPCA acumulado')
+plt.title('IPCA acumulado entre os anos de 2002 e 2020')
+plt.show()
+
+#Perda de valor de 100 reais desde a criação do real
+dados2 = {'Anos': [1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], 'Valor': [100, 78.04, 67.84, 63.93, 62.02, 59.29, 55.34, 51.67, 48.03, 41.50, 38.84, 36.43, 35.04, 33.77, 31.77, 30.36, 29.02, 27.14, 26.83, 25.79, 24.26, 22.77, 20.77, 19.09, 18.58, 17.78, 17.22, 15.43, 13.91]}
+df3 = pd.DataFrame(data=dados2)
+df3
+fig, ax = plt.subplots(figsize=(18,6))
+plt.plot(df3['Anos'], df3['Valor'])
+
+for i, txt in enumerate(df3['Valor']):
+    ax.annotate(txt, (df3['Anos'][i], df3['Valor'][i]))
+
+plt.xlabel('Anos')
+plt.ylabel('Valores')
+plt.title('Desvalorização de uma nota de 100 reais desde a criação do real como moeda')
+plt.show()
