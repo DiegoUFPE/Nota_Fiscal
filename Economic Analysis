@@ -1,0 +1,13 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.read_csv("/content/drive/MyDrive/Dólar de 010722 até 311222/CotacoesMoedasPeriodo (1).csv", sep = ",")
+
+plt.plot(df["USD"])
+plt.xlabel("Período em dias")
+plt.ylabel("Valor da cotação do dólar em reais")
+plt.title("Cotação do Dólar em reais no período de 01/07/2022 até 31/12/2022")
+plt.show()
+
